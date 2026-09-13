@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extended Warranty</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 80px;
+        }
+
+        .plan {
+            margin-top: 10px;
+        }
+
+        .plan input {
+            width: auto;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Extended Warranty</h1>
+
+    <form action="extended_warranty.php" method="POST">
+
+        <label>Customer Name</label>
+        <input type="text" name="name" required>
+
+        <label>Phone Number</label>
+        <input type="tel" name="phone" required>
+
+        <label>Phone Model</label>
+        <input type="text" name="phone_model" required>
+
+        <label>Repair Description</label>
+        <textarea name="repair_description" ></textarea>
+
+        <label>Start Date</label>
+        <input type="date" name="start" id="start" required>
+
+        <label>Warranty Plan</label>
+
+        <div class="plan">
+            <input type="radio" name="plan" value="30" onclick="calculateExpiry()" required>
+            Plan A - 30 days
+        </div>
+
+        <div class="plan">
+            <input type="radio" name="plan" value="6" onclick="calculateExpiry()">
+            Plan B - 6 months
+        </div>
+
+        <div class="plan">
+            <input type="radio" name="plan" value="12" id="C" onclick="calculateExpiry()">
+            Plan C - 12 months
+        </div>
+
+        <label>Warranty Expiry</label>
+        <input type="date" name="warranty_expiry" id="warranty_expiry" readonly>
+
+        <label>Notes</label>
+<textarea
+    name="notes"
+    placeholder="Add any additional information..."
+></textarea>
+
+        <button type="submit">Add Warranty</button>
+
+    </form>
+
+    <script>
+function calculateExpiry() {
+
+    const startValue = document.getElementById("start").value;
+    const plan = document.querySelector('input[name="plan"]:checked');
+
+    if (!startValue || !plan) {
+        return;
+    }
+
+    const date = new Date(startValue + "T00:00:00");
+
+    if (plan.value === "30") {
+        date.setDate(date.getDate() + 30);
+    } 
+    else if (plan.value === "6") {
+        date.setMonth(date.getMonth() + 6);
+    } 
+    else if (plan.value === "12") {
+        date.setFullYear(date.getFullYear() + 1);
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    document.getElementById("warranty_expiry").value =
+        `${year}-${month}-${day}`;
+}
+
+document.getElementById("start").addEventListener("change", calculateExpiry);
+
+document.querySelectorAll('input[name="plan"]').forEach(function(radio) {
+    radio.addEventListener("change", calculateExpiry);
+});
+
+document.getElementById("start").value =
+    new Date().toISOString().split("T")[0];
+
+calculateExpiry();
+</script>
+
+
+
+</body>
+</html>

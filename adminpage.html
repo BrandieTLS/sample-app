@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer List</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .view-button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .view-button:hover {
+            background-color: #0056b3;
+        }
+
+        #message {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Customer List</h1>
+
+    <div class="search-box">
+        <input
+            type="text"
+            id="search"
+            placeholder="Search customer or phone number"
+            onkeyup="filterCustomers()"
+        >
+    </div>
+
+    <table id="customerTable">
+
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Warranties</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody id="customerList">
+            <!-- Customers will be loaded here -->
+        </tbody>
+
+    </table>
+
+    <div id="message">Loading customers...</div>
+
+
+    <script>
+
+        let customers = [];
+
+
+        async function loadCustomers() {
+
+            const message = document.getElementById("message");
+            const customerList = document.getElementById("customerList");
+
+            try {
+
+                const response = await fetch("adminpage.php");
+
+                const data = await response.json();
+
+                if (!data.success) {
+
+                    message.textContent = data.message;
+                    return;
+
+                }
+
+                customers = data.data;
+
+                displayCustomers(customers);
+
+                message.textContent = "";
+
+            } catch (error) {
+
+                console.error(error);
+
+                message.textContent = "Something went wrong.";
+
+            }
+
+        }
+
+
+        function displayCustomers(customerData) {
+
+            const customerList =
+                document.getElementById("customerList");
+
+            customerList.innerHTML = "";
+
+            customerData.forEach(function(customer) {
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${customer.name}</td>
+
+                    <td>${customer.phone}</td>
+
+                    <td>${customer.warranty_count}</td>
+
+                    <td>
+                        <button
+                            class="view-button"
+                            onclick="viewCustomer('${customer.phone}')"
+                        >
+                            View
+                        </button>
+                    </td>
+                `;
+
+                customerList.appendChild(row);
+
+            });
+
+        }
+
+
+        function filterCustomers() {
+
+            const search =
+                document.getElementById("search")
+                .value
+                .toLowerCase();
+
+            const filteredCustomers = customers.filter(function(customer) {
+
+                return (
+                    customer.name.toLowerCase().includes(search) ||
+                    customer.phone.includes(search)
+                );
+
+            });
+
+            displayCustomers(filteredCustomers);
+
+        }
+
+
+        function viewCustomer(phone) {
+
+            window.location.href =
+                "customer.php?phone=" +
+                encodeURIComponent(phone);
+
+        }
+
+
+        loadCustomers();
+
+    </script>
+
+</body>
+</html>
+

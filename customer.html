@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>Warranty Lookup</title>
+
+<style>
+
+    body {
+        font-family: Arial;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+
+    input {
+        padding: 12px;
+        width: 50%;
+    }
+
+    button {
+        padding: 12px 20px;
+        cursor: pointer;
+    }
+
+    #result {
+        margin-top: 30px;
+    }
+
+    .warranty {
+        border: 1px solid #ccc;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+    }
+
+</style>
+
+
+</head>
+
+<body>
+
+
+<h1>Warranty Checker</h1>
+
+<p>Enter phone number:</p>
+
+<input
+    type="tel"
+    id="phone"
+    placeholder="91235467"
+>
+
+<button onclick="searchWarranty()">
+    Search
+</button>
+
+<div id="result"></div>
+
+
+<script>
+
+    async function searchWarranty() {
+
+        const phone =
+            document.getElementById("phone").value.trim();
+
+        const result =
+            document.getElementById("result");
+
+
+        if (phone === "") {
+
+            result.innerHTML =
+                "<p>Please enter a phone number.</p>";
+
+            return;
+        }
+
+
+        result.innerHTML =
+            "<p>Searching...</p>";
+
+
+        try {
+
+            const response = await fetch(
+                "search.php?phone=" +
+                encodeURIComponent(phone)
+            );
+
+
+            const data = await response.json();
+
+
+            if (!data.success) {
+
+                result.innerHTML =
+                    "<p>" + data.message + "</p>";
+
+                return;
+            }
+
+
+            let html = `
+                <h2>Warranty Records</h2>
+
+                <p>
+                    Customer Name:
+                    <strong>${data.data[0].name}</strong>
+                </p>
+            `;
+
+
+            data.data.forEach(function(warranty) {
+
+                html += `
+
+                    <div class="warranty">
+
+                        <h3>
+                            Phone model:
+                            ${warranty.phone_model}
+                        </h3>
+
+                        <p>
+                            <p>Plan: ${
+                                warranty.plan === "30"
+                                ? "30 Days"
+                                : warranty.plan === "6"
+                                ? "6 Months"
+                                : warranty.plan === "12"
+                                ? "1 Year"
+                                : warranty.plan
+}</p>
+                        </p>
+
+                        <p>
+                            Warranty Start:
+                            ${warranty.start_date}
+                        </p>
+
+                        <p>
+                            Warranty Expiry:
+                            ${warranty.warranty_expiry}
+                        </p>
+
+                        <p>
+                            Repair:
+                            ${warranty.repair_description || "N/A"}
+                        </p>
+
+                        <p>
+                            Notes:
+                            ${warranty.notes || "N/A"}
+                        </p>
+
+                    </div>
+
+                `;
+
+            });
+
+
+            result.innerHTML = html;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            result.innerHTML =
+                "<p>Something went wrong.</p>";
+        }
+
+    }
+
+</script>
+
+</body>
+
+</html>
