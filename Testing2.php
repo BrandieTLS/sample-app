@@ -49,15 +49,18 @@ $plan = $_POST["plan"]; // text
 $warranty_expiry = $_POST["warranty_expiry"]; //date
 $notes = $_POST["notes"]; 
 
-}
-
-
 // Calculate warranty expiry
 if ($_SERVER["REQUEST_METHOD"] == "POST"){
 $expiry_date = date(
     "Y-m-d",
     strtotime("+$plan months", strtotime($start_date))
 );}
+
+
+
+
+
+
 
 
 
@@ -100,7 +103,7 @@ if ($stmt->execute()) {
 
 $stmt->close();
 $conn->close();
-
+}
 ?>
 
 <!DOCTYPE html>
@@ -245,5 +248,4 @@ calculateExpiry();
 </script>
 </body>
 </html>
-
 
